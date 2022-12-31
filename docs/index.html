@@ -93,10 +93,6 @@
     {
         if(1)// cool trails!!!, easy trick to avoid typing too much...
         {
-          ctx. save()
-          ctx.globalAlpha=0.1;
-          ctx.drawImage(back,0,0,canvas.width, canvas.height,0,0,bw,bh);
-          ctx.restore
           // we erase the canvas at the start of the loop
           ctx.fillStyle="rgba(0,0,0,0.1)";
           ctx.fillRect(0,0,w,h); // w and h are widht and height of the canvas!! This means erase the whole canvas.
@@ -112,7 +108,7 @@
         
         
         // always.
-      if(Math.random()<0.01) // probability of an arrow.60 frames per seconds*0.05= 10 arrows? every second on average..
+      if(part.length==0 || Math.random()<0.01) // probability of an arrow.60 frames per seconds*0.05= 10 arrows? every second on average..
        {
 //        console.log("creating an arrow....");// now it is "ghosted", it´s still there next time I need it, but it won´t execute.
 
@@ -269,7 +265,5 @@
   
   </script>
 <!--Yes, so proud of me, now... -->
-<img id="back" src="gebroken-kerstba.jpg">
-<img id="overlay" src="gebroken-kerstbal.png">
 </body>
 </html>
