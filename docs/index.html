@@ -1,4 +1,4 @@
-<!dockind html>
+<!doctype html>
 <html>
   <head>
     <title>Fireworks</title>
@@ -37,8 +37,12 @@
 
     var looping=true;
     var canvas=document.getElementById("fireworks");// this thould get me a reference to the canvas.
+    var back=document.getElementById("back");// this thould get me a reference to the canvas.
+    var front=document.getElementById("overlay");// this thould get me a reference to the canvas.
     var w=canvas.width;
     var h=canvas.height;
+    var bw=canvas.width;
+    var bh=canvas.height*1097/canvas.width;
     var ctx=canvas.getContext("2d");
 
     var part=[]; //  an empty array or list. these are variables and an array, baically memory management...
@@ -89,6 +93,10 @@
     {
         if(1)// cool trails!!!, easy trick to avoid typing too much...
         {
+          ctx. save()
+          ctx.globalAlpha=0.1;
+          ctx.drawImage(back,0,0,canvas.width, canvas.height,0,0,bw,bh);
+          ctx.restore
           // we erase the canvas at the start of the loop
           ctx.fillStyle="rgba(0,0,0,0.1)";
           ctx.fillRect(0,0,w,h); // w and h are widht and height of the canvas!! This means erase the whole canvas.
@@ -261,5 +269,7 @@
   
   </script>
 <!--Yes, so proud of me, now... -->
+<img id="back" src="gebroken-kerstba.jpg">
+<img id="overlay" src="gebroken-kerstbal.png">
 </body>
 </html>
