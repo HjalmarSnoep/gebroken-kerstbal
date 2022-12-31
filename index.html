@@ -1,0 +1,265 @@
+<!dockind html>
+<html>
+  <head>
+    <title>Fireworks</title>
+    <style>
+      html, body
+      {
+      padding:0;
+      margin:0;
+        height: 100%;
+      }
+      canvas{
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left:0 ;
+        bottom: 0 ;
+        right: 0;
+        background: #000;/* this is faster */
+      }
+    </style>
+  </head>
+<body>
+  <canvas id="fireworks"></canvas>
+  <script>
+  
+          // now that is what I call fireworks, good moment to stop.
+          // I will enjoy going on an making it a new-years card.
+          // next time..
+          // adding some sound and lettering..
+          // I cleaned a little in between..
+          // not  much..
+          // programming seemed to work better today.
+          // so it´s easier to keep my promises to myself..
+          // I am sooo happy I can do this..
+
+
+    var looping=true;
+    var canvas=document.getElementById("fireworks");// this thould get me a reference to the canvas.
+    var w=canvas.width;
+    var h=canvas.height;
+    var ctx=canvas.getContext("2d");
+
+    var part=[]; //  an empty array or list. these are variables and an array, baically memory management...
+
+    function createParticleFrom(obj,new_kind)
+    {
+       o=JSON.parse(JSON.stringify(obj)); // this clones the particle to a new instance Iĺl explain when we get to memory and JSON etc.
+       o.kind=new_kind;
+       o.l=0;
+       part.push(o);// so now there should be one particle with glitter, let´s stop the loop and do a memory dump.
+      return o;
+
+    }
+    function explodeIntoFragments(o)
+    {
+        var n=Math.floor(Math.random()*5+5);
+        for(var i=0;i<n;i++)
+        {
+          var rad=i/n*Math.PI*2; // radial segmentation into n parts.
+          rad+=(Math.random()-0.5);// make it random, but only a bit..
+          var fragment=createParticleFrom(o,"fragment");  //errors are your friend, not your enemy.
+          fragment.dx=o.dx+Math.cos(rad);
+          fragment.dy=o.dy+Math.sin(rad);
+          fragment.c.r+=160*Math.random(); // that is festive..
+          fragment.c.g+=160*Math.random();// slight color variation..
+          fragment.c.b+=160*Math.random();
+          fragment.l=10+10*Math.random(); // short life span.. /// these countey will go down??
+        }
+    }
+    function explodeIntoGlitter(o)
+    {
+        var n=Math.floor(Math.random()*5+5);
+        for(var i=0;i<n;i++)
+        {
+          var rad=i/n*Math.PI*2; // radial segmentation into n parts.
+          var glitter=createParticleFrom(o,"glitter");  //errors are your friend, not your enemy.
+          glitter.dx=o.dx+Math.cos(rad);
+          glitter.dy=o.dy+Math.sin(rad);
+          var behaviors=["fall","rise","something","flock"]; // just one behaviour now..so nothing changed..
+          glitter.behaviour=behaviors[Math.floor(behaviors.length*Math.random())];
+          glitter.l=120+20*Math.random();
+        }
+    }
+
+    animate();
+     //  this is our loop
+    function animate()
+    {
+        if(1)// cool trails!!!, easy trick to avoid typing too much...
+        {
+          // we erase the canvas at the start of the loop
+          ctx.fillStyle="rgba(0,0,0,0.1)";
+          ctx.fillRect(0,0,w,h); // w and h are widht and height of the canvas!! This means erase the whole canvas.
+          }else
+          {
+           ctx.clearRect(0,0,w,h); // w and h are widht and height of the canvas!! This means erase the whole canvas.
+          }
+        // I don´t completely erase now, just 90% so we get trails.
+        // nice for fireworks.
+        ctx.fillStyle="#fff";// default draw color is white from now on...
+        // here I make the pen-color white, so all my fllRects will result in White rects.
+        // ok, now we sleep again....
+        
+        
+        // always.
+      if(Math.random()<0.01) // probability of an arrow.60 frames per seconds*0.05= 10 arrows? every second on average..
+       {
+//        console.log("creating an arrow....");// now it is "ghosted", it´s still there next time I need it, but it won´t execute.
+
+        // create a new particle.
+        var o={}; // make an object, we´ll get into that later.
+        o.x=Math.random()*w; // this is somewhere on the horizontal axis
+        o.y=h; // this is the bottom of the screen, sorry, mathmaticians, should be the top, but it´s not.
+        o.kind="arrow"; // we are going to make some different kinds, but we always start with the arrow
+        o.dy=-1-Math.random()/2; //move up, but all at differnt speeds and a bit harder...
+        o.l=0;// give them a life counter.
+        o.behaviour="fall";// set behaviour for the glitter.
+        o.c={};
+        o.c.r=Math.random()*128+128; // colorred
+        o.c.g=Math.random()*128+128; // color green
+        o.c.b=Math.random()*128+128; // color blue
+        o.die=false; // don´s remove from list.
+        o.dx=-0.5+Math.random(); // random is a value between 0 and 1, so this it between -0.5 and 0.
+        part.push(o) ;// put it in the list.
+      }
+      // always
+      // control a particles.
+      var i;
+      var killem=false;
+      // go through the list.
+      for(i=0;i<part.length;i++)
+      {
+
+        o=part[i]; // oops.
+        // move the particles
+        o.x+=o.dx;// move in the dx direction
+        o.y+=o.dy;
+        // get some gravity
+        
+        o.dy+=0.01;
+        
+        switch(o.kind)
+        {
+          case "fragment": // the glitter kind is created by "arrow" kinds..
+            o.l--; // decrease the life counter.
+            o.dx*=0.9; // add friction to glitter, it is very light.
+            o.dy*=0.9; // add friction to glitter, it is very light.
+            ctx.fillRect(o.x,o.y,1,1); // 1 pixels
+            if(o.l<=0)
+            {
+              // end of a fragment.
+              explodeIntoGlitter(o);
+              o.die=true;
+              killem=true;
+            }
+            
+          break;
+          case "glitter": // the glitter kind is created by "arrow" kinds..
+            //console.log("glitter specific....");// doed this bit ever get execured...??? NOPE
+            o.l--; // decrease the life counter.
+            o.dx*=0.9; // add friction to glitter, it is very light.
+            o.dy*=0.9; // add friction to glitter, it is very light.
+            switch(o.behaviour)
+            {
+              case "flock":
+                 // pick the next and the prev.
+                   var next_one=part[(part.length+i+1)%part.length];
+                   var f1=Math.sin(o.y/30+o.x/30);
+                   var f2=1-f1;
+                    var prev_one=part[(part.length+i-1)%part.length];
+                   var mid_x=(next_one.x*f1+f2*prev_one.x);
+                   var mid_y=(next_one.y*f1+f2*prev_one.y);
+                   o.dx*=0.9; // friction
+                   o.dy*=0.9;
+                   o.dx+=(mid_x-o.x)/150;// move toward middle of prev and next, average..
+                   o.dy+=(mid_y-o.y)/150; // little drones..
+              break;
+              case "rise":
+                o.dy-=0.03; // got it...
+              break;
+              case "something":
+                o.dy+=0.03;
+                o.dx+=Math.sin(o.y)/10;
+              break;
+              
+              case "fall":
+                o.dy+=0.03; // soft gravity..
+              break;
+            }
+            /// right now it just followed the arror precisely, my theory is
+            // that this will show the glitter.
+            // sorry about all that...
+            
+            ctx.fillStyle="rgb("+o.c.r+","+o.c.g+","+o.c.b+")"; // make the glitter a random color...
+            if(Math.random()<0.9)
+              ctx.fillRect(o.x,o.y,1,1); // one pixel
+              // just draw it sometimes.
+              // make glitter short lived.
+            if(o.l<=0)
+            {
+              // take them out of the list.
+              o.die=true;
+              killem=true;
+            }
+          break;
+            case "arrow":
+            // create glitter particles from the arrow..
+              o.l++; // increase the life counter.
+            if(Math.random()<0.3)// I want more glitter..
+            {
+              // on an average of every hundrethh frame, make some glitter.
+              //console.log("creating glitter....");
+              var glitter=createParticleFrom(o,"glitter");
+              glitter.l=20;
+            }
+            // draw the particles
+            if(o.l>100)
+            {
+              // take them out of the list.
+              // this is the end of the arrow.
+              explodeIntoFragments(o);
+              o.die=true;
+              killem=true;
+            }
+            if(Math.random()<0.01)// I want more of the glitte effect..
+            {
+              // only draw glitter sometimes, so it glitters..
+              ctx.fillRect(o.x,o.y,1,1); // one pixel
+            }
+        }
+        
+      }
+      // always
+
+// ah, I learned a lot from that.
+//- it works, but you don´t see the glitter
+
+//- I need to change the layout, right now, it is keeping the aspect of the canvas. not important right now..
+// but I was wondering earlier why that didn´t work, I´d want to spread the canvas to the bottom of the page.
+
+
+      // kill all particles that need to be taken out of the loop.
+      // premature optimization is the root of all evil I am doing two things et the same time again.
+      if(killem)
+      {
+        // only if we need to kill someone.
+        for(i=part.length-1;i>=0;i--)// I´ll explain this when we get to loops.
+        {
+          if(part[i].die)
+          {
+            part.splice(i,1) // Iĺl explain this when we get to arrays.
+          }
+        }
+      }
+      // works now..
+      
+      if(looping)
+      window.requestAnimationFrame(animate);// expected it to turn another color.Maybe I made a mistake, test!
+    }
+  
+  </script>
+<!--Yes, so proud of me, now... -->
+</body>
+</html>
